@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hinge — The electric bike that folds under your desk</title>
+  <meta name="description" content="Hinge is a 14 kg electric folding bike. Ride the last stretch of your commute, fold it in 12 seconds and carry it anywhere.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cobalt: #2438E8;
+      --cobalt-deep: #1A29B8;
+      --paper: #F7F8FC;
+      --ink: #10122B;
+      --mist: #DDE2FF;
+      --signal: #FFD23F;
+      --display: "Bricolage Grotesque", "Arial Narrow", Arial, sans-serif;
+      --body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body {
+      margin: 0;
+      font-family: var(--body);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { max-width: 100%; display: block; }
+    a { color: inherit; }
+    h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.02; letter-spacing: -0.02em; margin: 0; }
+    p { margin: 0; }
+
+    :focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+    .on-light :focus-visible, main section:not(.hero) :focus-visible { outline-color: var(--cobalt); }
+
+    .wrap { width: min(1120px, 100% - 3rem); margin-inline: auto; }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 52px; padding: 0 1.6rem;
+      font: 700 1rem/1 var(--body);
+      border-radius: 999px; border: 2px solid transparent;
+      text-decoration: none; cursor: pointer;
+      transition: transform .15s ease, background-color .15s ease, color .15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-signal { background: var(--signal); color: var(--ink); }
+    .btn-signal:hover { background: #ffe07a; }
+    .btn-line { border-color: rgba(255,255,255,.55); color: #fff; }
+    .btn-line:hover { background: rgba(255,255,255,.12); }
+    .btn-ink { background: var(--ink); color: #fff; }
+    .btn-ink:hover { background: var(--cobalt); }
+
+    /* ---------- Header ---------- */
+    header.site {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--cobalt);
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; min-height: 68px; gap: 1rem; }
+    .logo { font: 800 1.7rem/1 var(--display); letter-spacing: -0.03em; text-decoration: none; display: flex; align-items: center; gap: .5rem; }
+    .logo i { width: 14px; height: 14px; background: var(--signal); border-radius: 50%; display: inline-block; }
+    .nav ul { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; align-items: center; }
+    .nav a.link { text-decoration: none; font-weight: 500; padding: .4rem 0; border-bottom: 2px solid transparent; }
+    .nav a.link:hover { border-bottom-color: var(--signal); }
+    .nav .btn { min-height: 44px; padding: 0 1.2rem; }
+    .menu-toggle { display: none; background: none; border: 2px solid rgba(255,255,255,.5); color: #fff; border-radius: 10px; padding: .5rem .8rem; font: 700 .95rem var(--body); cursor: pointer; }
+
+    /* ---------- Hero ---------- */
+    .hero { background: var(--cobalt); color: #fff; padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(3rem, 7vw, 6rem); overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+    .hero h1 { font-size: clamp(2.8rem, 7vw, 5.6rem); }
+    .hero .lede { margin-top: 1.5rem; max-width: 34em; font-size: 1.2rem; color: #E6EAFF; }
+    .hero .actions { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .8rem; }
+    .hero .fine { margin-top: 1.25rem; font-size: .95rem; color: #C5CCFF; }
+
+    .stage { position: relative; }
+    .stage svg { width: 100%; height: auto; overflow: visible; }
+    .bike line, .bike circle, .bike path, .bike rect { vector-effect: non-scaling-stroke; }
+    .bike .stroke { stroke: #fff; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .bike .wheel { stroke: #fff; stroke-width: 7; fill: none; }
+    .bike .wheel-front { stroke: var(--signal); }
+    .bike .spoke { stroke: rgba(255,255,255,.35); stroke-width: 2; }
+    .bike .battery { fill: var(--signal); }
+    .bike .front {
+      transform-box: view-box; transform-origin: 300px 0;
+      transition: transform 1s cubic-bezier(.65, 0, .25, 1);
+    }
+    .stage.is-folded .front { transform: scaleX(-1); }
+    .ground { stroke: rgba(255,255,255,.35); stroke-width: 3; stroke-dasharray: 2 12; stroke-linecap: round; }
+    .fold-btn { margin-top: 1rem; width: 100%; }
+    .stage-caption { margin-top: .75rem; font-size: .95rem; color: #C5CCFF; text-align: center; }
+
+    /* hero entrance: one orchestrated moment */
+    @media (prefers-reduced-motion: no-preference) {
+      .hero h1, .hero .lede, .hero .actions, .stage { opacity: 0; transform: translateY(18px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+      .hero .lede { animation-delay: .12s; }
+      .hero .actions { animation-delay: .24s; }
+      .stage { animation-delay: .32s; }
+    }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+
+    /* ---------- Generic sections ---------- */
+    section { padding: clamp(3.5rem, 8vw, 6.5rem) 0; }
+    .section-head { max-width: 40rem; margin-bottom: 3rem; }
+    .section-head h2 { font-size: clamp(2rem, 4.5vw, 3.4rem); }
+    .section-head p { margin-top: 1rem; color: #3D4066; }
+
+    /* ---------- Features ---------- */
+    .features { background: var(--paper); }
+    .feature-list { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+    .feature-list li { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; gap: 1.5rem 3rem; padding: 1.75rem 0; border-bottom: 1px solid #C9CDE6; align-items: baseline; }
+    .feature-list .big { font: 800 clamp(2rem, 4.5vw, 3.2rem)/1 var(--display); letter-spacing: -0.03em; color: var(--cobalt); }
+    .feature-list h3 { font-size: 1.35rem; margin-bottom: .35rem; letter-spacing: -0.01em; }
+    .feature-list p { color: #3D4066; max-width: 38em; }
+
+    /* ---------- Calculator ---------- */
+    .calc { background: var(--mist); }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+    .calc form { display: grid; gap: 1.6rem; }
+    .field label, .field legend { display: block; font-weight: 700; margin-bottom: .6rem; padding: 0; }
+    fieldset.field { border: 0; margin: 0; padding: 0; }
+    .range-row { display: flex; align-items: center; gap: 1rem; }
+    .range-row output { min-width: 5.5ch; font: 800 1.4rem var(--display); color: var(--cobalt); }
+    input[type="range"] { width: 100%; accent-color: var(--cobalt); height: 28px; }
+    .seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+    .seg label { margin: 0; font-weight: 500; position: relative; }
+    .seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+    .seg span { display: block; padding: .8rem 1rem; border: 2px solid var(--ink); border-radius: 12px; background: #fff; text-align: center; transition: background-color .15s, color .15s; }
+    .seg input:checked + span { background: var(--ink); color: #fff; }
+    .seg input:focus-visible + span { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+
+    .result { background: var(--ink); color: #fff; border-radius: 22px; padding: clamp(1.5rem, 4vw, 2.5rem); }
+    .result .label { color: #B9BFEA; font-size: .95rem; }
+    .result .saving { font: 800 clamp(2.6rem, 6vw, 4.2rem)/1 var(--display); color: var(--signal); letter-spacing: -0.03em; margin: .3rem 0 1.4rem; }
+    .result dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: .7rem 1rem; border-top: 1px solid rgba(255,255,255,.2); padding-top: 1.2rem; }
+    .result dt { color: #B9BFEA; }
+    .result dd { margin: 0; font-weight: 700; text-align: right; }
+    .result .note { margin-top: 1.2rem; font-size: .88rem; color: #9AA1D6; }
+
+    /* ---------- Specs ---------- */
+    .specs-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(2rem, 5vw, 4rem); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 320px; }
+    th, td { text-align: left; padding: 1rem 0; border-bottom: 1px solid #C9CDE6; vertical-align: top; }
+    th { font-weight: 500; color: #3D4066; width: 45%; padding-right: 1rem; }
+    td { font-weight: 700; }
+    caption { text-align: left; font: 800 1.35rem var(--display); padding-bottom: .8rem; }
+
+    /* ---------- Reviews ---------- */
+    .reviews { background: var(--cobalt); color: #fff; }
+    .reviews .section-head p { color: #D6DBFF; }
+    .quotes { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); }
+    blockquote { margin: 0; }
+    blockquote p { font: 500 clamp(1.3rem, 2.6vw, 1.75rem)/1.3 var(--display); letter-spacing: -0.01em; }
+    blockquote footer { margin-top: 1.2rem; display: flex; align-items: center; gap: .8rem; color: #D6DBFF; font-size: .98rem; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--signal); color: var(--ink); display: grid; place-items: center; font: 800 1rem var(--display); flex: none; }
+
+    /* ---------- Signup ---------- */
+    .signup { background: var(--paper); }
+    .signup-box { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+    .signup h2 { font-size: clamp(2rem, 4.5vw, 3.4rem); }
+    .signup .lead { margin-top: 1rem; color: #3D4066; max-width: 28em; }
+    .perks { margin: 1.5rem 0 0; padding: 0; list-style: none; display: grid; gap: .6rem; }
+    .perks li { padding-left: 1.6rem; position: relative; }
+    .perks li::before { content: ""; position: absolute; left: 0; top: .6em; width: 10px; height: 10px; border-radius: 50%; background: var(--cobalt); }
+    form.reserve { display: grid; gap: 1.2rem; background: #fff; border: 2px solid var(--ink); border-radius: 22px; padding: clamp(1.4rem, 3.5vw, 2.2rem); }
+    .reserve input[type="text"], .reserve input[type="email"] {
+      width: 100%; min-height: 52px; padding: 0 1rem; font: 500 1rem var(--body); color: var(--ink);
+      border: 2px solid #B7BCDD; border-radius: 12px; background: #fff;
+    }
+    .reserve input[type="text"]:focus, .reserve input[type="email"]:focus { border-color: var(--cobalt); outline: 3px solid var(--mist); }
+    .reserve .invalid { border-color: #C62828 !important; }
+    .error { color: #B71C1C; font-size: .9rem; min-height: 1.2em; margin-top: .3rem; }
+    .swatches { display: flex; gap: .7rem; flex-wrap: wrap; }
+    .swatches label { margin: 0; position: relative; font-weight: 500; }
+    .swatches input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+    .swatches span { display: flex; align-items: center; gap: .5rem; padding: .5rem .9rem .5rem .55rem; border: 2px solid #B7BCDD; border-radius: 999px; }
+    .swatches i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); display: block; }
+    .swatches input:checked + span { border-color: var(--ink); background: var(--mist); }
+    .swatches input:focus-visible + span { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+    .success { display: none; background: var(--ink); color: #fff; border-radius: 22px; padding: 2rem; }
+    .success h3 { font-size: 1.8rem; color: var(--signal); margin-bottom: .6rem; }
+    .signup-box.done form.reserve { display: none; }
+    .signup-box.done .success { display: block; }
+
+    /* ---------- Footer ---------- */
+    footer.site { background: var(--ink); color: #C7CBEA; padding: 3rem 0; font-size: .95rem; }
+    .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; align-items: center; }
+    .foot .logo { color: #fff; }
+    .foot ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .foot a { text-decoration: none; }
+    .foot a:hover { color: #fff; text-decoration: underline; }
+    .copy { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.15); font-size: .85rem; color: #8D93C4; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .hero-grid, .calc-grid, .specs-grid, .quotes, .signup-box { grid-template-columns: 1fr; }
+      .feature-list li { grid-template-columns: 1fr; gap: .5rem; }
+      .menu-toggle { display: block; }
+      .nav ul {
+        display: none; position: absolute; top: 68px; left: 0; right: 0;
+        flex-direction: column; align-items: stretch; gap: 0;
+        background: var(--cobalt-deep); padding: 1rem 1.5rem 1.5rem;
+      }
+      .nav ul.open { display: flex; }
+      .nav ul li { padding: .6rem 0; }
+      .nav ul .btn { width: 100%; margin-top: .5rem; }
+    }
+    @media (max-width: 480px) {
+      .wrap { width: calc(100% - 2rem); }
+      .seg { grid-template-columns: 1fr 1fr; }
+      .hero .actions .btn { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .bike .front { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site">
+    <div class="wrap nav">
+      <a href="#top" class="logo" aria-label="Hinge home"><i aria-hidden="true"></i>Hinge</a>
+      <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navList">Menu</button>
+      <ul id="navList">
+        <li><a class="link" href="#features">Why Hinge</a></li>
+        <li><a class="link" href="#calculator">Savings</a></li>
+        <li><a class="link" href="#specs">Specs</a></li>
+        <li><a class="link" href="#reviews">Reviews</a></li>
+        <li><a class="btn btn-signal" href="#reserve">Reserve yours</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <h1 id="hero-title">A real bike that folds into the corner of your office.</h1>
+          <p class="lede">Hinge is a 14 kg electric folding bike. Ride the long middle of your commute, fold it in 12 seconds, and carry it onto the train, into the lift and under your desk.</p>
+          <div class="actions">
+            <a class="btn btn-signal" href="#reserve">Reserve yours</a>
+            <a class="btn btn-line" href="#calculator">Calculate my savings</a>
+          </div>
+          <p class="fine">Refundable ₹2,000 deposit. Deliveries start in January.</p>
+        </div>
+
+        <div class="stage" id="stage">
+          <svg class="bike" viewBox="0 0 600 340" role="img" aria-label="Line drawing of the Hinge bike. Use the button below to fold or unfold it.">
+            <line class="ground" x1="20" y1="342" x2="580" y2="342"/>
+            <!-- rear half (stays put) -->
+            <g>
+              <circle class="wheel" cx="140" cy="260" r="80"/>
+              <circle cx="140" cy="260" r="8" fill="#fff"/>
+              <line class="spoke" x1="140" y1="180" x2="140" y2="340"/>
+              <line class="spoke" x1="60" y1="260" x2="220" y2="260"/>
+              <line class="spoke" x1="84" y1="204" x2="196" y2="316"/>
+              <line class="spoke" x1="196" y1="204" x2="84" y2="316"/>
+              <line class="stroke" x1="140" y1="260" x2="300" y2="260"/>
+              <line class="stroke" x1="140" y1="260" x2="238" y2="168"/>
+              <line class="stroke" x1="300" y1="260" x2="238" y2="168"/>
+              <line class="stroke" x1="238" y1="168" x2="226" y2="116"/>
+              <line class="stroke" x1="200" y1="114" x2="256" y2="114"/>
+              <circle cx="300" cy="260" r="12" fill="var(--cobalt)" stroke="#fff" stroke-width="5"/>
+            </g>
+            <!-- front half (folds over the hinge) -->
+            <g class="front">
+              <circle class="wheel wheel-front" cx="460" cy="260" r="80"/>
+              <circle cx="460" cy="260" r="8" fill="var(--signal)"/>
+              <line class="spoke" x1="460" y1="180" x2="460" y2="340"/>
+              <line class="spoke" x1="380" y1="260" x2="540" y2="260"/>
+              <line class="spoke" x1="404" y1="204" x2="516" y2="316"/>
+              <line class="spoke" x1="516" y1="204" x2="404" y2="316"/>
+              <line class="stroke" x1="300" y1="260" x2="400" y2="150"/>
+              <rect class="battery" x="322" y="196" width="46" height="16" rx="6" transform="rotate(-48 345 204)"/>
+              <line class="stroke" x1="400" y1="150" x2="460" y2="260"/>
+              <line class="stroke" x1="400" y1="150" x2="414" y2="88"/>
+              <line class="stroke" x1="392" y1="86" x2="446" y2="86"/>
+            </g>
+          </svg>
+          <button type="button" class="btn btn-line fold-btn" id="foldBtn" aria-pressed="false">Fold it</button>
+          <p class="stage-caption" id="stageCaption">Unfolded: 168 cm long. Ready to ride.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="features-title">Built for the part of your commute that car and train can't cover.</h2>
+          <p>Most people live a few kilometres from the station and a few more from the office. Hinge covers both ends and then disappears.</p>
+        </div>
+        <ul class="feature-list">
+          <li>
+            <span class="big">12 sec</span>
+            <div>
+              <h3>Folds without tools</h3>
+              <p>One latch at the hinge, one at the stem. It locks shut and rolls on its own wheels, so you can pull it like a suitcase.</p>
+            </div>
+          </li>
+          <li>
+            <span class="big">14 kg</span>
+            <div>
+              <h3>Light enough to carry up stairs</h3>
+              <p>An aluminium frame and a battery that sits inside the frame keep the weight low. Folded, it is 64 cm long and fits under most desks.</p>
+            </div>
+          </li>
+          <li>
+            <span class="big">60 km</span>
+            <div>
+              <h3>A week of commuting per charge</h3>
+              <p>The removable battery charges from a normal wall socket in about three hours, at your desk or at home.</p>
+            </div>
+          </li>
+          <li>
+            <span class="big">25 km/h</span>
+            <div>
+              <h3>Quick, but still a bicycle</h3>
+              <p>Pedal-assist only. The motor helps when you pedal and stops when you stop, so there is nothing to register or insure in most cities.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CALCULATOR -->
+    <section class="calc" id="calculator" aria-labelledby="calc-title">
+      <div class="wrap calc-grid">
+        <div>
+          <div class="section-head" style="margin-bottom:2rem">
+            <h2 id="calc-title">What is your commute costing you?</h2>
+            <p>Tell us how you travel today. We'll work out what you'd save with Hinge and how long it takes to pay for itself.</p>
+          </div>
+          <form id="calcForm" novalidate>
+            <div class="field">
+              <label for="km">Distance to work, one way</label>
+              <div class="range-row">
+                <input type="range" id="km" min="2" max="40" value="12" step="1">
+                <output for="km" id="kmOut">12 km</output>
+              </div>
+            </div>
+            <div class="field">
+              <label for="days">Days you commute each week</label>
+              <div class="range-row">
+                <input type="range" id="days" min="1" max="7" value="5" step="1">
+                <output for="days" id="daysOut">5 days</output>
+              </div>
+            </div>
+            <fieldset class="field">
+              <legend>How you travel today</legend>
+              <div class="seg">
+                <label><input type="radio" name="mode" value="car" checked><span>Car</span></label>
+                <label><input type="radio" name="mode" value="bike"><span>Two-wheeler</span></label>
+                <label><input type="radio" name="mode" value="bus"><span>Bus or metro</span></label>
+                <label><input type="radio" name="mode" value="cab"><span>Cab or auto</span></label>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+        <div class="result" aria-live="polite">
+          <p class="label">You could save each year</p>
+          <p class="saving" id="yearSave">₹0</p>
+          <dl>
+            <dt>Your commute now, per month</dt><dd id="nowCost">₹0</dd>
+            <dt>With Hinge, per month</dt><dd id="hingeCost">₹0</dd>
+            <dt>Saved per month</dt><dd id="monthSave">₹0</dd>
+            <dt>Hinge pays for itself in</dt><dd id="payback">—</dd>
+          </dl>
+          <p class="note">Estimates only. Based on ₹8/km for a car, ₹3.5/km for a two-wheeler, ₹2.5/km for bus or metro, ₹14/km for a cab or auto, and ₹0.40/km to charge Hinge. Hinge price: ₹64,999.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPECS -->
+    <section id="specs" aria-labelledby="specs-title">
+      <div class="wrap specs-grid">
+        <div class="section-head" style="margin-bottom:0">
+          <h2 id="specs-title">The details, in plain numbers.</h2>
+          <p>Everything you'd ask before buying, in one table. Anything missing? Ask us on the form below.</p>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <caption>Hinge H1 specifications</caption>
+            <tbody>
+              <tr><th scope="row">Weight</th><td>14.2 kg with battery</td></tr>
+              <tr><th scope="row">Folded size</th><td>64 × 36 × 70 cm</td></tr>
+              <tr><th scope="row">Motor</th><td>250 W rear hub, pedal-assist</td></tr>
+              <tr><th scope="row">Range</th><td>Up to 60 km</td></tr>
+              <tr><th scope="row">Charge time</th><td>About 3 hours, 0–100%</td></tr>
+              <tr><th scope="row">Top assisted speed</th><td>25 km/h</td></tr>
+              <tr><th scope="row">Rider height</th><td>150–195 cm</td></tr>
+              <tr><th scope="row">Warranty</th><td>2 years on frame and motor</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="reviews" id="reviews" aria-labelledby="reviews-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="reviews-title">From the people who've been folding it.</h2>
+          <p>Feedback from our first 200 test riders.</p>
+        </div>
+        <div class="quotes">
+          <blockquote>
+            <p>I used to spend 40 minutes in traffic. Now it's 22 minutes door to door, and the bike lives next to my chair.</p>
+            <footer><span class="avatar" aria-hidden="true">AR</span><span>Aarav R., product designer</span></footer>
+          </blockquote>
+          <blockquote>
+            <p>My building doesn't allow bikes in the lobby. A folded Hinge is just a bag with wheels, and nobody has said a word.</p>
+            <footer><span class="avatar" aria-hidden="true">MK</span><span>Meera K., analyst</span></footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIGNUP -->
+    <section class="signup" id="reserve" aria-labelledby="reserve-title">
+      <div class="wrap signup-box" id="signupBox">
+        <div>
+          <h2 id="reserve-title">Reserve your Hinge.</h2>
+          <p class="lead">Pay a refundable ₹2,000 deposit when we confirm your slot. Today we only need your name and email.</p>
+          <ul class="perks">
+            <li>Cancel any time before delivery and get the deposit back</li>
+            <li>Early reservations ship first</li>
+            <li>Free helmet and lock for the first 500 riders</li>
+          </ul>
+        </div>
+
+        <form class="reserve" id="reserveForm" novalidate>
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" autocomplete="name" aria-describedby="nameErr">
+            <p class="error" id="nameErr" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" autocomplete="email" aria-describedby="emailErr">
+            <p class="error" id="emailErr" role="alert"></p>
+          </div>
+          <fieldset class="field">
+            <legend>Colour</legend>
+            <div class="swatches">
+              <label><input type="radio" name="colour" value="Signal yellow" checked><span><i style="background:#FFD23F"></i>Signal yellow</span></label>
+              <label><input type="radio" name="colour" value="Cobalt"><span><i style="background:#2438E8"></i>Cobalt</span></label>
+              <label><input type="radio" name="colour" value="Graphite"><span><i style="background:#2B2D3E"></i>Graphite</span></label>
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn-ink">Reserve yours</button>
+        </form>
+
+        <div class="success" id="success" role="status" tabindex="-1">
+          <h3 id="successTitle">You're on the list.</h3>
+          <p id="successMsg"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <div class="foot">
+        <a href="#top" class="logo"><i aria-hidden="true"></i>Hinge</a>
+        <ul>
+          <li><a href="#features">Why Hinge</a></li>
+          <li><a href="#calculator">Savings</a></li>
+          <li><a href="#specs">Specs</a></li>
+          <li><a href="#reserve">Reserve</a></li>
+        </ul>
+      </div>
+      <p class="copy">© 2026 Hinge Mobility. This page is a design exercise; Hinge is a fictional product.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ----- Mobile menu -----
+    const menuToggle = document.getElementById('menuToggle');
+    const navList = document.getElementById('navList');
+    menuToggle.addEventListener('click', () => {
+      const open = navList.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', open);
+    });
+    navList.addEventListener('click', e => {
+      if (e.target.closest('a')) {
+        navList.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // ----- Fold / unfold the bike -----
+    const stage = document.getElementById('stage');
+    const foldBtn = document.getElementById('foldBtn');
+    const caption = document.getElementById('stageCaption');
+    function setFolded(folded) {
+      stage.classList.toggle('is-folded', folded);
+      foldBtn.textContent = folded ? 'Unfold it' : 'Fold it';
+      foldBtn.setAttribute('aria-pressed', folded);
+      caption.textContent = folded
+        ? 'Folded: 64 cm long. Fits under your desk.'
+        : 'Unfolded: 168 cm long. Ready to ride.';
+    }
+    foldBtn.addEventListener('click', () => setFolded(!stage.classList.contains('is-folded')));
+
+    // ----- Savings calculator -----
+    const COST_PER_KM = { car: 8, bike: 3.5, bus: 2.5, cab: 14 };
+    const HINGE_PER_KM = 0.4;
+    const HINGE_PRICE = 64999;
+    const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+    const km = document.getElementById('km');
+    const days = document.getElementById('days');
+    const form = document.getElementById('calcForm');
+
+    function calculate() {
+      const distance = Number(km.value);
+      const d = Number(days.value);
+      const mode = form.querySelector('input[name="mode"]:checked').value;
+
+      document.getElementById('kmOut').textContent = distance + ' km';
+      document.getElementById('daysOut').textContent = d + (d === 1 ? ' day' : ' days');
+
+      const monthlyKm = distance * 2 * d * 4.33;           // round trip, weeks per month
+      const now = monthlyKm * COST_PER_KM[mode];
+      const hinge = monthlyKm * HINGE_PER_KM;
+      const saved = Math.max(now - hinge, 0);
+
+      document.getElementById('nowCost').textContent = fmt(now);
+      document.getElementById('hingeCost').textContent = fmt(hinge);
+      document.getElementById('monthSave').textContent = fmt(saved);
+      document.getElementById('yearSave').textContent = fmt(saved * 12);
+
+      const months = saved > 0 ? HINGE_PRICE / saved : Infinity;
+      let text = '—';
+      if (months <= 60) {
+        text = months < 12
+          ? months.toFixed(1) + ' months'
+          : (months / 12).toFixed(1) + ' years';
+      } else if (isFinite(months)) {
+        text = 'over 5 years';
+      }
+      document.getElementById('payback').textContent = text;
+    }
+    form.addEventListener('input', calculate);
+    form.addEventListener('submit', e => e.preventDefault());
+    calculate();
+
+    // ----- Reservation form validation -----
+    const reserveForm = document.getElementById('reserveForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const nameErr = document.getElementById('nameErr');
+    const emailErr = document.getElementById('emailErr');
+    const signupBox = document.getElementById('signupBox');
+    const success = document.getElementById('success');
+
+    function setError(input, el, msg) {
+      el.textContent = msg;
+      input.classList.toggle('invalid', Boolean(msg));
+      input.setAttribute('aria-invalid', Boolean(msg));
+    }
+    function validateName() {
+      const ok = nameInput.value.trim().length >= 2;
+      setError(nameInput, nameErr, ok ? '' : 'Enter your name (at least 2 characters).');
+      return ok;
+    }
+    function validateEmail() {
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailInput.value.trim());
+      setError(emailInput, emailErr, ok ? '' : 'Enter a valid email, like name@example.com.');
+      return ok;
+    }
+    nameInput.addEventListener('blur', validateName);
+    emailInput.addEventListener('blur', validateEmail);
+
+    reserveForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const okName = validateName();
+      const okEmail = validateEmail();
+      if (!okName) { nameInput.focus(); return; }
+      if (!okEmail) { emailInput.focus(); return; }
+
+      const first = nameInput.value.trim().split(/\s+/)[0];
+      const colour = reserveForm.querySelector('input[name="colour"]:checked').value;
+      document.getElementById('successTitle').textContent = `You're on the list, ${first}.`;
+      document.getElementById('successMsg').textContent =
+        `We've saved a ${colour} Hinge for you and will email ${emailInput.value.trim()} when your delivery slot opens.`;
+      signupBox.classList.add('done');
+      success.focus();
+    });
+
+    // Fold the bike once after the page loads, to show what it does
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTimeout(() => setFolded(true), 1800);
+      setTimeout(() => setFolded(false), 3800);
+    }
+  </script>
+</body>
+</html>
